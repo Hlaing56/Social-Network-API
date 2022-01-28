@@ -28,7 +28,7 @@ const thoughtController = {
     },
     createThought({ params, body }, res) {
         console.log(body);
-        Comment.create(body)
+        Thought.create(body)
         .then(({ _id }) => {
             return User.findOneAndUpdate(
               { _id: params.userId },
@@ -47,19 +47,9 @@ const thoughtController = {
     },
     updateThought({ params, body }, res) {
         Thought.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true })
-        .then(updatedThought => {
-            if (!updatedThought) {
-              return res.status(404).json({ message: 'No thought with this id!' });
-            }
-            return User.findOneAndUpdate(
-                { _id: params.userId },
-                { $push: { thoughts: params.thoughtid } },
-                { new: true }
-            );
-        })
         .then(dbPSNAData => {
             if (!dbPSNAData) {
-              res.status(404).json({ message: 'No user found with this id!' });
+              res.status(404).json({ message: 'No thought found with this id!' });
               return;
             }
             res.json(dbPSNAData);
