@@ -57,17 +57,7 @@ const thoughtController = {
         .catch(err => res.status(400).json(err));
     },
     removeThought({ params }, res) {
-        Thought.findOneAndDelete({ _id: params.thoughtid })
-        .then(deletedThought => {
-            if (!deletedThought) {
-              return res.status(404).json({ message: 'No thought with this id!' });
-            }
-            return User.findOneAndUpdate(
-                { _id: params.userId },
-                { $push: { thoughts: params.thoughtid } },
-                { new: true }
-            );
-        })
+        Thought.findOneAndDelete({ _id: params.id })
         .then(dbSNAData => {
             if (!dbSNAData) {
               res.status(404).json({ message: 'No user found with this id!' });
@@ -76,7 +66,31 @@ const thoughtController = {
             res.json(dbSNAData);
         })
         .catch(err => res.json(err));
-    }
+    },
+    createReaction({ params, body }, res) {
+        Thought.findOneAndUpdate(
+          { _id: params.thoughtId },
+          { $push: { reactions: body } },
+          { new: true, runValidators: true }
+        )
+          .then(dbSNAData => {
+            if (!dbSNAData) {
+              res.status(404).json({ message: 'No thought found with this id!' });
+              return;
+            }
+            res.json(dbSNAData);
+          })
+          .catch(err => res.json(err));
+    },
+    removeReaction({ params }, res) {
+        Thought.findOneAndUpdate(
+          { _id: params.thoughtId },
+          { $pull: { reactions: { reactionId: params.reactionId } } },
+          { new: true }
+        )
+          .then(dbSNAData => res.json(dbSNAData))
+          .catch(err => res.json(err));
+      }
 }
 
 module.exports = thoughtController;
