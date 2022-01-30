@@ -14,7 +14,7 @@ router.route('/').get(getAllThought);
 router.route('/:userId').post(createThought);
 
 
-router.route('/:thoughtId')
+router.route('/:userId/:thoughtId')
 .put(createReaction);
 
 router.route('/:id')
